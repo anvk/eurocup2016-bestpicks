@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import * as euroCupActions from '../../actions/euroCupActions.js';
 import { connect } from 'react-redux';
 import {
-  EuroCup,
   GroupStage,
   SelectStage,
   TeamPoints,
   BestPicks,
-  Pot
+  Pots
 } from '../../components';
 
 import {
@@ -16,7 +15,7 @@ import {
   MATCH_QUARTERFINALS,
   MATCH_SEMIFINALS,
   MATCH_FINALS,
-  sortByPoints
+  sortByTotalPoints
 } from '../../reducers/euroCup.js';
 
 class EuroCupContainer extends Component {
@@ -44,20 +43,7 @@ class EuroCupContainer extends Component {
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-md-3">
-            <Pot data={this.props.pot1} label="Pot 1" />
-          </div>
-          <div className="col-md-3">
-            <Pot data={this.props.pot2} label="Pot 2" />
-          </div>
-          <div className="col-md-3">
-            <Pot data={this.props.pot3} label="Pot 3" />
-          </div>
-          <div className="col-md-3">
-            <Pot data={this.props.pot4} label="Pot 4" />
-          </div>
-        </div>
+        <Pots />
 
         <div className="row">
           <div className="col-md-8">
@@ -169,7 +155,7 @@ class EuroCupContainer extends Component {
 function mapStateToProps(state, ownProps) {
   return {
     ...state.euroCup,
-    teams: state.euroCup.teams.slice().sort(sortByPoints)
+    teams: state.euroCup.teams.slice().sort(sortByTotalPoints)
   };
 }
 

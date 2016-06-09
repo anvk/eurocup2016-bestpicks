@@ -1,5 +1,5 @@
 import * as types from '../constants/actionTypes.js';
-import match from './match.js';
+import match, { DRAW } from './match.js';
 import defaultTeams from '../constants/defaultTeams.js';
 import { pot1, pot2, pot3, pot4 } from '../constants/pots.js';
 import { groupStage, roundOf16, quarterFinals, semiFinals, finals } from '../constants/matches.js';
@@ -21,8 +21,6 @@ const initialState = {
 
 export const SHOW_N_TOP_PICKS = 10;
 
-export const DRAW = 'DRAW';
-
 export const MATCH_GROUPSTAGE = 'MATCH_GROUPSTAGE';
 export const MATCH_ROUNDOF16 = 'MATCH_ROUNDOF16';
 export const MATCH_QUARTERFINALS = 'MATCH_QUARTERFINALS';
@@ -37,11 +35,28 @@ export function getFlag(teamName) {
   return findTeamByName(defaultTeams, teamName).flag;
 }
 
-export function sortByPoints(team1, team2) {
+export function sortByTotalPoints(team1, team2) {
   if (team1.totalPoints > team2.totalPoints) {
     return -1;
   }
   if (team1.totalPoints < team2.totalPoints) {
+    return 1;
+  }
+  // team1 must be equal to team2
+  return 0;
+}
+
+export function sortByTotalPointsAndGoals(team1, team2) {
+  const result = sortByTotalPoints(team1, team2);
+
+  if (result !== 0) {
+    return result;
+  }
+
+  if (team1.totalGoals > team2.totalGoals) {
+    return -1;
+  }
+  if (team1.totalGoals < team2.totalGoals) {
     return 1;
   }
   // team1 must be equal to team2
@@ -184,7 +199,8 @@ function findBestPicks(state) {
   const { pot1, pot2, pot3, pot4, teams } = state;
   const potAll = [...pot1, ...pot2, ...pot3, ...pot4];
   let result = [];
-  let totalPoints, pick;
+  let totalPoints, totalGoals, pick;
+  let teamP1, teamP2, teamP3, teamP4, teamPA;
 
   for (let p1 of pot1) {
     for (let p2 of pot2) {
@@ -196,23 +212,36 @@ function findBestPicks(state) {
               continue;
             }
 
-            totalPoints = findTeamByName(teams, p1).totalPoints +
-              findTeamByName(teams, p2).totalPoints +
-              findTeamByName(teams, p3).totalPoints +
-              findTeamByName(teams, p4).totalPoints +
-              findTeamByName(teams, pA).totalPoints;
+            teamP1 = findTeamByName(teams, p1);
+            teamP2 = findTeamByName(teams, p2);
+            teamP3 = findTeamByName(teams, p3);
+            teamP4 = findTeamByName(teams, p4);
+            teamPA = findTeamByName(teams, pA);
+
+            totalPoints = teamP1.totalPoints +
+              teamP2.totalPoints +
+              teamP3.totalPoints +
+              teamP4.totalPoints +
+              teamPA.totalPoints;
+
+            totalGoals = teamP1.totalGoals +
+              teamP2.totalGoals +
+              teamP3.totalGoals +
+              teamP4.totalGoals +
+              teamPA.totalGoals;
 
             pick = [pA, p1, p2, p3, p4];
 
             result.push({
+              id: pick.join('-'),
               p1,
               p2,
               p3,
               p4,
               pA,
               teams: pick,
-              label: pick.join('-'),
-              totalPoints
+              totalPoints,
+              totalGoals
             });
           }
         }
@@ -220,7 +249,7 @@ function findBestPicks(state) {
     }
   }
 
-  return result.sort(sortByPoints).slice(0, SHOW_N_TOP_PICKS);
+  return result.sort(sortByTotalPointsAndGoals).slice(0, SHOW_N_TOP_PICKS);
 }
 
 export default function euroCup(state = initialState, action) {

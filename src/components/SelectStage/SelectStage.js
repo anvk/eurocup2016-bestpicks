@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { getFlag, DRAW } from '../../reducers/euroCup.js';
+import { getFlag } from '../../reducers/euroCup.js';
+import { DRAW, getLabel } from '../../reducers/match.js';
 import defaultTeams from '../../constants/defaultTeams.js';
 
 class SelectStageRow extends Component {
@@ -55,19 +56,7 @@ class SelectStageRow extends Component {
               onChange(matchId, name, parseInt(value));
             }}
           />
-          <select
-            name="winner"
-            className={(!team1 && !team2) ? 'disabled' : undefined}
-            value={winner || ''}
-            onChange={event => {
-              const { value, name } = event.target;
-              onChange(matchId, name, value);
-            }}
-          >
-            <option value="">{'???'}</option>
-            <option value={team1}>{'>>>'}</option>
-            <option value={team2}>{'<<<'}</option>
-          </select>
+          {getLabel(goal1, goal2)}
           <input
             className="width-xs"
             name="goal2"

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { pot1, pot2, pot3, pot4 } from '../../constants/pots.js';
 
-import { Pot } from '../';
+import { Pots } from '../';
 
 class Rules extends Component {
   render() {
@@ -13,20 +12,7 @@ class Rules extends Component {
         <div>
           <h2>POT TEAMS SELECTION:</h2>
 
-          <div className="row">
-            <div className="col-md-3">
-              <Pot data={pot1} label="Pot 1" />
-            </div>
-            <div className="col-md-3">
-              <Pot data={pot2} label="Pot 2" />
-            </div>
-            <div className="col-md-3">
-              <Pot data={pot3} label="Pot 3" />
-            </div>
-            <div className="col-md-3">
-              <Pot data={pot4} label="Pot 4" />
-            </div>
-          </div>
+          <Pots />
 
           <p>
             You are required to select ONE team from all POTs plus a 5th team from any of the POTs. These teams will carry through the entire tournament (round robin and playoffs) so you will continue to earn points as long as the team is playing.
