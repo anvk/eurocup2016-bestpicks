@@ -38,10 +38,10 @@ export function getFlag(teamName) {
 }
 
 export function sortByPoints(team1, team2) {
-  if (team1.points > team2.points) {
+  if (team1.totalPoints > team2.totalPoints) {
     return -1;
   }
-  if (team1.points < team2.points) {
+  if (team1.totalPoints < team2.totalPoints) {
     return 1;
   }
   // team1 must be equal to team2
@@ -184,7 +184,7 @@ function findBestPicks(state) {
   const { pot1, pot2, pot3, pot4, teams } = state;
   const potAll = [...pot1, ...pot2, ...pot3, ...pot4];
   let result = [];
-  let points, pick;
+  let totalPoints, pick;
 
   for (let p1 of pot1) {
     for (let p2 of pot2) {
@@ -196,7 +196,7 @@ function findBestPicks(state) {
               continue;
             }
 
-            points = findTeamByName(teams, p1).totalPoints +
+            totalPoints = findTeamByName(teams, p1).totalPoints +
               findTeamByName(teams, p2).totalPoints +
               findTeamByName(teams, p3).totalPoints +
               findTeamByName(teams, p4).totalPoints +
@@ -212,7 +212,7 @@ function findBestPicks(state) {
               pA,
               teams: pick,
               label: pick.join('-'),
-              points
+              totalPoints
             });
           }
         }

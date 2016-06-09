@@ -2,25 +2,15 @@ import React, { Component } from 'react';
 
 class BestPicksRow extends Component {
   render() {
-    const {
-      teams,
-      label,
-      points,
-      p1,
-      p2,
-      p3,
-      p4,
-      pA
-    } = this.props;
-
     return (
       <tr>
-        <td>{p1}</td>
-        <td>{p2}</td>
-        <td>{p3}</td>
-        <td>{p4}</td>
-        <td>{pA}</td>
-        <td>{points}</td>
+        <td></td>
+        <td>{this.props.p1}</td>
+        <td>{this.props.p2}</td>
+        <td>{this.props.p3}</td>
+        <td>{this.props.p4}</td>
+        <td>{this.props.pA}</td>
+        <td>{this.props.totalPoints}</td>
       </tr>
     );
   }
@@ -33,6 +23,7 @@ class BestPicks extends Component {
         <caption>Best Picks:</caption>
         <thead>
           <tr>
+            <th>#</th>
             <th>Pot 1</th>
             <th>Pot 2</th>
             <th>Pot 3</th>
