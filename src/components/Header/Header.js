@@ -28,11 +28,11 @@ class Header extends Component {
 
           <div id="project-navbar-collapse" className="navbar-collapse collapse">
             <ul className="nav navbar-nav">
-              <li role="presentation" className={tabLocation === 'home' ? 'active' : ''}>
-                <a href="/" onClick={onNavigate('home', '/')}>Best Picks</a>
+              <li role="presentation" className={tabLocation === 'euro2016' ? 'active' : ''}>
+                <a href="/euro2016" onClick={onNavigate('euro2016', '/euro2016')}>Best Picks</a>
               </li>
               <li role="presentation" className={tabLocation === 'rules' ? 'active' : ''}>
-                <a href="/rules" onClick={onNavigate('rules', '/rules')}>Rules</a>
+                <a href="/euro2016/rules" onClick={onNavigate('rules', '/euro2016/rules')}>Rules</a>
               </li>
             </ul>
           </div>
