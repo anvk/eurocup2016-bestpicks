@@ -30,6 +30,11 @@ export default function match(state = initialState, action) {
         return state;
       }
 
+      state = {
+        ...state,
+        [action.name]: action.value
+      };
+
       let winner = state.winner;
 
       if (state.goal1 === state.goal2) {
@@ -38,13 +43,12 @@ export default function match(state = initialState, action) {
       else if (state.goal1 > state.goal2) {
         winner = state.team1;
       }
-      else if (state.goal2 < state.goal1) {
+      else if (state.goal1 < state.goal2) {
         winner = state.team2;
       }
 
       return {
         ...state,
-        [action.name]: action.value,
         winner
       };
     default:

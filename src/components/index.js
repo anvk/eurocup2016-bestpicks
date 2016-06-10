@@ -10,3 +10,4 @@ export Pot from './Pot/Pot.js';
 export Pots from './Pots/Pots.js';
 export GitHubRibbon from './GitHubRibbon/GitHubRibbon.js';
 export Rules from './Rules/Rules.js'
+export Finalist from './Finalist/Finalist.js'

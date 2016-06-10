@@ -199,4 +199,15 @@ const defaultTeams = [
   }
 ];
 
-export default defaultTeams;
+export function sortByName(team1, team2) {
+  if (team1.name < team2.name) {
+    return -1;
+  }
+  if (team1.name > team2.name) {
+    return 1;
+  }
+  // team1 must be equal to team2
+  return 0;
+}
+
+export default defaultTeams.sort(sortByName);

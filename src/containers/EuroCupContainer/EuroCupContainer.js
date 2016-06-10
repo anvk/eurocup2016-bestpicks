@@ -6,7 +6,8 @@ import {
   SelectStage,
   TeamPoints,
   BestPicks,
-  Pots
+  Pots,
+  Finalist
 } from '../../components';
 
 import {
@@ -20,9 +21,7 @@ import {
 
 class EuroCupContainer extends Component {
   render() {
-    const {
-      changeValue
-    } = this.props;
+    const { changeValue } = this.props;
 
     return (
       <div>
@@ -107,6 +106,12 @@ class EuroCupContainer extends Component {
           </div>
         </div>
 
+        <div className="row">
+          <div className="col-md-8">
+            <Finalist finalist={this.props.finalist} />
+          </div>
+        </div>
+
         <div className="row space-below">
           <div className="col-md-12">
             <button type="button"
@@ -134,6 +139,12 @@ class EuroCupContainer extends Component {
             </button>
           </div>
         </div>
+
+        {
+          this.props.finalGoals ?
+          <p>{`Total goals for Euro2016: ${this.props.finalGoals}`}</p>
+          : null
+        }
 
         {
           this.props.bestPicks.length ?

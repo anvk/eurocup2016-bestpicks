@@ -32,7 +32,7 @@ class Header extends Component {
                 <a href="/" onClick={onNavigate('home', '/')}>Best Picks</a>
               </li>
               <li role="presentation" className={tabLocation === 'rules' ? 'active' : ''}>
-                <a href="/rules" onClick={onNavigate('rules')}>Rules</a>
+                <a href="/rules" onClick={onNavigate('rules', '/rules')}>Rules</a>
               </li>
             </ul>
           </div>

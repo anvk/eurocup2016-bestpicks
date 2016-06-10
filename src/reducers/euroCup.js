@@ -12,14 +12,16 @@ const initialState = {
   quarterFinals: [ ...quarterFinals],
   semiFinals: [ ...semiFinals],
   finals: [ ...finals],
+  finalist: undefined,
   pot1,
   pot2,
   pot3,
   pot4,
-  bestPicks: []
+  bestPicks: [],
+  finalGoals: 0
 };
 
-export const SHOW_N_TOP_PICKS = 10;
+export const SHOW_N_TOP_PICKS = 30;
 
 export const MATCH_GROUPSTAGE = 'MATCH_GROUPSTAGE';
 export const MATCH_ROUNDOF16 = 'MATCH_ROUNDOF16';
@@ -68,7 +70,7 @@ function copy(array = []) {
 }
 
 function getTeamWithPoints(state) {
-  const { groupStage, roundOf16, quarterFinals, semiFinals, finals } = state;
+  const { groupStage, roundOf16, quarterFinals, semiFinals, finals, finalist } = state;
   let result = copy(defaultTeams);
   let team1, team2;
   let visited = []
@@ -182,14 +184,26 @@ function getTeamWithPoints(state) {
 
     if (e.winner && e.winner.length) {
       findTeamByName(result, e.winner).points += pointSystem.win;
-      findTeamByName(result, e.winner).points += pointSystem.winner;
       visited.push(e.team2);
     }
   }
 
+  findTeamByName(result, finalist).points += pointSystem.winner;
+
   // now count total points
   for (let e of result) {
     e.totalPoints = e.points + e.totalGoals;
+  }
+
+  return result;
+}
+
+function countEuroTotalGoals(state) {
+  let result = 0;
+  const { teams } = state;
+
+  for (let team of result) {
+    result += team.totalGoals;
   }
 
   return result;
@@ -262,8 +276,13 @@ export default function euroCup(state = initialState, action) {
         teams: getTeamWithPoints(state)
       };
 
+      let finalGoals = state.teams.reduce((total, team) => {
+        return total + team.totalGoals;
+      }, 0);
+
       return {
         ...state,
+        finalGoals,
         bestPicks: findBestPicks(state)
       };
     case types.EUROCUP_CHANGE_VALUE:
@@ -292,9 +311,14 @@ export default function euroCup(state = initialState, action) {
         };
       }
       else if (action.matchType === MATCH_FINALS) {
-        return {
+        state = {
           ...state,
           finals: state.finals.map(e => match(e, action))
+        };
+
+        return {
+          ...state,
+          finalist: state.finals[0].winner
         };
       }
 

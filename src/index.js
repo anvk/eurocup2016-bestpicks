@@ -9,7 +9,6 @@ import configureStore from './store/configureStore.js';
 ReactDOM.render(
   <Provider store={configureStore()}>
     <Router history={browserHistory}>
-      <Redirect from="/" to="home" />
       {routes}
     </Router>
   </Provider>,
