@@ -15,9 +15,10 @@ import {
   MATCH_ROUNDOF16,
   MATCH_QUARTERFINALS,
   MATCH_SEMIFINALS,
-  MATCH_FINALS,
-  sortByTotalPoints
-} from '../../reducers/euroCup.js';
+  MATCH_FINALS
+} from '../../constants/matches.js';
+
+import { sortByTotalPoints } from '../../constants/defaultTeams.js';
 
 class EuroCupContainer extends Component {
   render() {

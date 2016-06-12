@@ -1,9 +1,22 @@
 import * as types from '../constants/actionTypes.js';
 import match, { DRAW } from './match.js';
-import defaultTeams from '../constants/defaultTeams.js';
+import defaultTeams, { findTeamByName, sortByTotalPointsAndGoals } from '../constants/defaultTeams.js';
 import { pot1, pot2, pot3, pot4 } from '../constants/pots.js';
-import { groupStage, roundOf16, quarterFinals, semiFinals, finals } from '../constants/matches.js';
 import pointSystem from '../constants/pointSystem.js';
+
+import {
+  MATCH_GROUPSTAGE,
+  MATCH_ROUNDOF16,
+  MATCH_QUARTERFINALS,
+  MATCH_SEMIFINALS,
+  MATCH_FINALS,
+
+  groupStage,
+  roundOf16,
+  quarterFinals,
+  semiFinals,
+  finals
+} from '../constants/matches.js';
 
 const initialState = {
   teams: [ ...defaultTeams],
@@ -23,187 +36,99 @@ const initialState = {
 
 export const SHOW_N_TOP_PICKS = 30;
 
-export const MATCH_GROUPSTAGE = 'MATCH_GROUPSTAGE';
-export const MATCH_ROUNDOF16 = 'MATCH_ROUNDOF16';
-export const MATCH_QUARTERFINALS = 'MATCH_QUARTERFINALS';
-export const MATCH_SEMIFINALS = 'MATCH_SEMIFINALS';
-export const MATCH_FINALS = 'MATCH_FINALS';
-
-function findTeamByName(teams, teamName) {
-  return teams.find(team => team.name === teamName) || {};
-}
-
-export function getFlag(teamName) {
-  return findTeamByName(defaultTeams, teamName).flag;
-}
-
-export function sortByTotalPoints(team1, team2) {
-  if (team1.totalPoints > team2.totalPoints) {
-    return -1;
-  }
-  if (team1.totalPoints < team2.totalPoints) {
-    return 1;
-  }
-  // team1 must be equal to team2
-  return 0;
-}
-
-export function sortByTotalPointsAndGoals(team1, team2) {
-  const result = sortByTotalPoints(team1, team2);
-
-  if (result !== 0) {
-    return result;
-  }
-
-  if (team1.totalGoals > team2.totalGoals) {
-    return -1;
-  }
-  if (team1.totalGoals < team2.totalGoals) {
-    return 1;
-  }
-  // team1 must be equal to team2
-  return 0;
-}
-
 function copy(array = []) {
   return JSON.parse(JSON.stringify(array));
 }
 
-function getTeamWithPoints(state) {
-  const { groupStage, roundOf16, quarterFinals, semiFinals, finals, finalist } = state;
-  let result = copy(defaultTeams);
+function getRoundPoints(teams, matches, winPoints, roundPoints) {
+  let result = copy(teams);
+  let visited = [];
   let team1, team2;
-  let visited = []
 
-  for (let e of groupStage) {
-    team1 = findTeamByName(result, e.team1);
-    team2 = findTeamByName(result, e.team2);
+  for (let match of matches) {
+    team1 = findTeamByName(result, match.team1);
+    team2 = findTeamByName(result, match.team2);
 
-    team1.totalGoals += e.goal1;
-    team2.totalGoals += e.goal2;
+    team1.totalGoals += match.goal1;
+    team2.totalGoals += match.goal2;
 
-    if (e.winner && e.winner.length) {
-      if (e.winner === DRAW) {
-        team1.points += pointSystem.draw;
-        team2.points += pointSystem.draw;
-      } else {
-        findTeamByName(result, e.winner).points += pointSystem.win;
+    if (match.team1 && !visited.includes(match.team1)) {
+      team1.points += roundPoints;
+      visited.push(match.team1);
+    }
+
+    if (match.team2 && !visited.includes(match.team2)) {
+      team2.points += roundPoints;
+      visited.push(match.team2);
+    }
+
+    if (match.winner && match.winner.length) {
+      findTeamByName(result, match.winner).points += winPoints;
+      visited.push(match.team2);
+    }
+  }
+
+  return result;
+}
+
+function getGroupStagePoints(teams, groupStage, winPoints, drawPoints) {
+  let result = copy(defaultTeams);
+  let visited = [];
+  let team1, team2;
+
+  for (let match of groupStage) {
+    team1 = findTeamByName(result, match.team1);
+    team2 = findTeamByName(result, match.team2);
+
+    team1.totalGoals += match.goal1;
+    team2.totalGoals += match.goal2;
+
+    if (match.winner && match.winner.length) {
+      if (match.winner === DRAW) {
+        team1.points += drawPoints;
+        team2.points += drawPoints;
+        continue;
       }
+
+      findTeamByName(result, match.winner).points += winPoints;
     }
   }
 
-  visited = [];
-  for (let e of roundOf16) {
-    team1 = findTeamByName(result, e.team1);
-    team2 = findTeamByName(result, e.team2);
+  return result;
+}
 
-    team1.totalGoals += e.goal1;
-    team2.totalGoals += e.goal2;
+function getTeamWithPoints(state) {
+  const {
+    groupStage,
+    roundOf16,
+    quarterFinals,
+    semiFinals,
+    finals,
+    finalist
+  } = state;
 
-    if (e.team1 && !visited.includes(e.team1)) {
-      team1.points += pointSystem.roundOf16;
-      visited.push(e.team1);
-    }
+  let result;
 
-    if (e.team2 && !visited.includes(e.team2)) {
-      team2.points += pointSystem.roundOf16;
-      visited.push(e.team2);
-    }
+  result = getGroupStagePoints(result, groupStage, pointSystem.win,
+    pointSystem.draw);
 
-    if (e.winner && e.winner.length) {
-      findTeamByName(result, e.winner).points += pointSystem.win;
-      visited.push(e.team2);
-    }
-  }
+  result = getRoundPoints(result, roundOf16, pointSystem.win,
+    pointSystem.roundOf16);
 
-  visited = [];
-  for (let e of quarterFinals) {
-    team1 = findTeamByName(result, e.team1);
-    team2 = findTeamByName(result, e.team2);
+  result = getRoundPoints(result, quarterFinals, pointSystem.win,
+    pointSystem.quarterFinals);
 
-    team1.totalGoals += e.goal1;
-    team2.totalGoals += e.goal2;
+  result = getRoundPoints(result, semiFinals, pointSystem.win,
+    pointSystem.semiFinals);
 
-    if (e.team1 && !visited.includes(e.team1)) {
-      team1.points += pointSystem.quarterFinals;
-      visited.push(e.team1);
-    }
-
-    if (e.team2 && !visited.includes(e.team2)) {
-      team2.points += pointSystem.quarterFinals;
-      visited.push(e.team2);
-    }
-
-    if (e.winner && e.winner.length) {
-      findTeamByName(result, e.winner).points += pointSystem.win;
-      visited.push(e.team2);
-    }
-  }
-
-  visited = [];
-  for (let e of semiFinals) {
-    team1 = findTeamByName(result, e.team1);
-    team2 = findTeamByName(result, e.team2);
-
-    team1.totalGoals += e.goal1;
-    team2.totalGoals += e.goal2;
-
-    if (e.team1 && !visited.includes(e.team1)) {
-      team1.points += pointSystem.semiFinals;
-      visited.push(e.team1);
-    }
-
-    if (e.team2 && !visited.includes(e.team2)) {
-      team2.points += pointSystem.semiFinals;
-      visited.push(e.team2);
-    }
-
-    if (e.winner && e.winner.length) {
-      findTeamByName(result, e.winner).points += pointSystem.win;
-      visited.push(e.team2);
-    }
-  }
-
-  visited = [];
-  for (let e of finals) {
-    team1 = findTeamByName(result, e.team1);
-    team2 = findTeamByName(result, e.team2);
-
-    team1.totalGoals += e.goal1;
-    team2.totalGoals += e.goal2;
-
-    if (e.team1 && !visited.includes(e.team1)) {
-      team1.points += pointSystem.finals;
-      visited.push(e.team1);
-    }
-
-    if (e.team2 && !visited.includes(e.team2)) {
-      team2.points += pointSystem.finals;
-      visited.push(e.team2);
-    }
-
-    if (e.winner && e.winner.length) {
-      findTeamByName(result, e.winner).points += pointSystem.win;
-      visited.push(e.team2);
-    }
-  }
+  result = getRoundPoints(result, finals, pointSystem.win,
+    pointSystem.finals);
 
   findTeamByName(result, finalist).points += pointSystem.winner;
 
   // now count total points
   for (let e of result) {
     e.totalPoints = e.points + e.totalGoals;
-  }
-
-  return result;
-}
-
-function countEuroTotalGoals(state) {
-  let result = 0;
-  const { teams } = state;
-
-  for (let team of result) {
-    result += team.totalGoals;
   }
 
   return result;
@@ -276,7 +201,7 @@ export default function euroCup(state = initialState, action) {
         teams: getTeamWithPoints(state)
       };
 
-      let finalGoals = state.teams.reduce((total, team) => {
+      const finalGoals = state.teams.reduce((total, team) => {
         return total + team.totalGoals;
       }, 0);
 

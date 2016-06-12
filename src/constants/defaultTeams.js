@@ -210,4 +210,40 @@ export function sortByName(team1, team2) {
   return 0;
 }
 
+export function findTeamByName(teams, teamName) {
+  return teams.find(team => team.name === teamName) || {};
+}
+
+export function getFlag(teamName) {
+  return findTeamByName(defaultTeams, teamName).flag;
+}
+
+export function sortByTotalPoints(team1, team2) {
+  if (team1.totalPoints > team2.totalPoints) {
+    return -1;
+  }
+  if (team1.totalPoints < team2.totalPoints) {
+    return 1;
+  }
+  // team1 must be equal to team2
+  return 0;
+}
+
+export function sortByTotalPointsAndGoals(team1, team2) {
+  const result = sortByTotalPoints(team1, team2);
+
+  if (result !== 0) {
+    return result;
+  }
+
+  if (team1.totalGoals > team2.totalGoals) {
+    return -1;
+  }
+  if (team1.totalGoals < team2.totalGoals) {
+    return 1;
+  }
+  // team1 must be equal to team2
+  return 0;
+}
+
 export default defaultTeams.sort(sortByName);

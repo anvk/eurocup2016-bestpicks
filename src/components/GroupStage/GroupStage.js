@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getFlag } from '../../reducers/euroCup.js';
+import { getFlag } from '../../constants/defaultTeams.js';
 import { DRAW, getLabel } from '../../reducers/match.js';
 
 class GroupStageRow extends Component {

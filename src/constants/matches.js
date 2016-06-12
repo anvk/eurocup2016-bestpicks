@@ -1,3 +1,9 @@
+export const MATCH_GROUPSTAGE = 'MATCH_GROUPSTAGE';
+export const MATCH_ROUNDOF16 = 'MATCH_ROUNDOF16';
+export const MATCH_QUARTERFINALS = 'MATCH_QUARTERFINALS';
+export const MATCH_SEMIFINALS = 'MATCH_SEMIFINALS';
+export const MATCH_FINALS = 'MATCH_FINALS';
+
 export const groupStage = [
   {
     matchId: 1,
